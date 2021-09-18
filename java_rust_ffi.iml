@@ -12,6 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro2-cecd7ae0bcf8d632/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/syn-6ac24133acfe86c2/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/rustffi-fb0c20f5232f7486/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ffm_jextract" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/rustffi/target" />
       <excludeFolder url="file://$MODULE_DIR$/rustjni/target" />

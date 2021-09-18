@@ -104,7 +104,9 @@ public class TestFFM {
     }
 
     public void testStruct(){
-        MemoryLayout.structLayout(MemoryLayouts.JAVA_INT.withName("num"),MemoryLayouts.ADDRESS.withName("title"));
+        MemoryLayout layout= MemoryLayout.structLayout(MemoryLayouts.JAVA_INT.withName("num"),MemoryLayouts.ADDRESS.withName("title"));
+        MemorySegment segment=SegmentAllocator.ofScope(ResourceScope.newImplicitScope()).allocate(layout);
+
     }
 
 }
