@@ -10,6 +10,14 @@ import java.util.Arrays;
 
 /**
  * 运行时加上vm参数 --enable-native-access=net.jueb.rust.ffi
+ * 分配外部内存
+ * （MemorySegment-内存段，MemoryAddress和SegmentAllocator-段分配器）,
+ * 操作和访问结构化外部内存
+ * （MemoryLayout-内存布局，MemoryHandles和MemoryAccess），
+ * 管理外部资源的生命周期（ResourceScope）和
+ * 调用外部函数（SymbolLookup和CLinker）
+ * SymbolLookup::loaderLookup返回一个包括本加载器内加载的所有库内部的标识的查找器
+ * CLinker::systemLookup返回一个特定于平台的标识查找器，它能查找标准C库内的标识
  */
 public class TestFFM {
 
@@ -46,9 +54,11 @@ public class TestFFM {
                 MethodType.methodType(MemoryAddress.class, MemoryAddress.class),
                 FunctionDescriptor.of(layout, layout)
         );
-        MemorySegment arg = CLinker.toCString("Hello", ResourceScope.newImplicitScope());
-        MemoryAddress result = (MemoryAddress) printString.invokeExact(arg.address());
-        System.out.println(CLinker.toJavaString(result));
+        try (ResourceScope scope=ResourceScope.newConfinedScope()){
+            MemorySegment arg = CLinker.toCString("Hello",scope);
+            MemoryAddress result = (MemoryAddress) printString.invokeExact(arg.address());
+            System.out.println(CLinker.toJavaString(result));
+        }
     }
 
     @Test
@@ -80,9 +90,10 @@ public class TestFFM {
                 MethodType.methodType(void.class, int.class, MemoryAddress.class),
                 FunctionDescriptor.ofVoid(CLinker.C_INT, CLinker.C_POINTER)
         );
-        MemorySegment inputSegment = MemorySegment.ofArray(input);
-        MemorySegment arg = MemorySegment.allocateNative(inputSegment.byteSize(), ResourceScope.newImplicitScope());
-        arg.copyFrom(inputSegment);
+//        MemorySegment inputSegment = MemorySegment.ofArray(input);
+//        MemorySegment arg = MemorySegment.allocateNative(inputSegment.byteSize(), ResourceScope.newImplicitScope());
+        //        arg.copyFrom(inputSegment);
+        MemorySegment arg =  SegmentAllocator.ofScope(ResourceScope.newImplicitScope()).allocateArray(MemoryLayouts.JAVA_INT, input);
         printString.invokeExact(input.length, arg.address());
         System.out.println(Arrays.toString(arg.toFloatArray()));
     }
@@ -91,4 +102,9 @@ public class TestFFM {
         float[] input = new float[]{1, 2, 3};
         System.out.println("input:" + Arrays.toString(input));
     }
+
+    public void testStruct(){
+        MemoryLayout.structLayout(MemoryLayouts.JAVA_INT.withName("num"),MemoryLayouts.ADDRESS.withName("title"));
+    }
+
 }
